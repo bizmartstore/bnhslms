@@ -69,6 +69,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <LMSHeader />
+      <AdminVerifiedBanner />
 
       <div className="max-w-3xl mx-auto">
         {/* Hero Banner */}
