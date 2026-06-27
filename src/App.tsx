@@ -24,6 +24,7 @@ import TeachSubjectDashboard from "./pages/TeachSubjectDashboard.tsx";
 import StudentSubjectView from "./pages/StudentSubjectView.tsx";
 import CompleteProfilePage from "./pages/CompleteProfilePage.tsx";
 import EventsPage from "./pages/EventsPage.tsx";
+import AdminDiagnosticsPage from "./pages/AdminDiagnosticsPage.tsx";
 
 const queryClient = new QueryClient();
 
