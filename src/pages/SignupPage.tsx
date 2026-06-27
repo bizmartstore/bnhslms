@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { UserPlus, ArrowLeft, GraduationCap, BookOpen } from "lucide-react";
 import { signUpWithProfile } from "@/lib/signup-profile";
 import { isBootstrapAdmin } from "@/lib/auth-config";
+import { formatSignupError, validateSignupPassword } from "@/lib/password-validation";
 
 type SignupTab = "student" | "teacher";
 
@@ -61,12 +62,9 @@ const SignupPage = () => {
   };
 
   const validatePasswords = (password: string, confirmPassword: string) => {
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
-      return false;
-    }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
+    const error = validateSignupPassword(password, confirmPassword);
+    if (error) {
+      toast.error(error);
       return false;
     }
     return true;
@@ -103,7 +101,7 @@ const SignupPage = () => {
       navigate("/login");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Signup failed";
-      toast.error(message);
+      toast.error(formatSignupError(message));
     } finally {
       setLoading(false);
     }
@@ -138,7 +136,7 @@ const SignupPage = () => {
       navigate("/login");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Signup failed";
-      toast.error(message);
+      toast.error(formatSignupError(message));
     } finally {
       setLoading(false);
     }
@@ -241,7 +239,7 @@ const SignupPage = () => {
 
               <div className="space-y-2">
                 <Label>Password *</Label>
-                <Input type="password" placeholder="At least 6 characters" value={studentForm.password} onChange={(e) => handleStudentChange("password", e.target.value)} />
+                <Input type="password" placeholder="8+ chars, upper, lower, number" value={studentForm.password} onChange={(e) => handleStudentChange("password", e.target.value)} />
               </div>
 
               <div className="space-y-2">
@@ -290,7 +288,7 @@ const SignupPage = () => {
 
               <div className="space-y-2">
                 <Label>Password *</Label>
-                <Input type="password" placeholder="At least 6 characters" value={teacherForm.password} onChange={(e) => handleTeacherChange("password", e.target.value)} />
+                <Input type="password" placeholder="8+ chars, upper, lower, number" value={teacherForm.password} onChange={(e) => handleTeacherChange("password", e.target.value)} />
               </div>
 
               <div className="space-y-2">

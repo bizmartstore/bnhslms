@@ -1,17 +1,17 @@
 # BNHS LMS
 
-## Supabase setup (project `mvxyqbjwnpwcovkarwqa`)
+## Supabase setup (project `rzjoqlqlqbzvjfuvqszr`)
 
 ### 1. API keys in `.env`
 
 Copy `.env.example` to `.env` and set:
 
-- `VITE_SUPABASE_URL` — `https://mvxyqbjwnpwcovkarwqa.supabase.co`
-- `VITE_SUPABASE_PUBLISHABLE_KEY` — **anon public** key from [Supabase Dashboard → Settings → API](https://supabase.com/dashboard/project/mvxyqbjwnpwcovkarwqa/settings/api)
+- `VITE_SUPABASE_URL` — `https://rzjoqlqlqbzvjfuvqszr.supabase.co`
+- `VITE_SUPABASE_PUBLISHABLE_KEY` — publishable key from [Supabase Dashboard → Settings → API](https://supabase.com/dashboard/project/rzjoqlqlqbzvjfuvqszr/settings/api)
 
 Restart the dev server after changing `.env`.
 
-**Lovable** (`*.lovable.app`): Production builds use committed `.env.production` and `src/config/supabase-public.ts`, so the app works even if Lovable Cloud still has an old Supabase connection with empty/wrong secrets. For a clean setup, open **Cloud → Secrets** and set (or remove stale) `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` for project `mvxyqbjwnpwcovkarwqa`, or disconnect the old Supabase integration in Lovable. Lovable injects `/__l5e/events.js` on publish; `public/lovable-analytics-shim.js` blocks those analytics calls so you do not get `trackevents 403` console noise. To avoid injection entirely, deploy with `npm run deploy` (Cloudflare Workers).
+**Lovable** (`*.lovable.app`): Production builds use committed `.env.production` and `src/config/supabase-public.ts`, so the app works even if Lovable Cloud still has an old Supabase connection with empty/wrong secrets. For a clean setup, open **Cloud → Secrets** and set (or remove stale) `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY` for project `rzjoqlqlqbzvjfuvqszr`, or disconnect the old Supabase integration in Lovable. Lovable injects `/__l5e/events.js` on publish; `public/lovable-analytics-shim.js` blocks those analytics calls so you do not get `trackevents 403` console noise. To avoid injection entirely, deploy with `npm run deploy` (Cloudflare Workers).
 
 Local dev: copy `.env.example` → `.env` (gitignored).
 
@@ -34,6 +34,14 @@ npm run db:push:sql
 ```
 
 This creates all tables, RLS policies, RPCs (`grant_admin_role`, `submit_quiz`), and storage buckets (`banners`, `materials`, `submissions`).
+
+**Migrate content from the old project** (optional — requires service role keys in `.env`):
+
+```bash
+npm run db:migrate-data
+```
+
+Set `OLD_SUPABASE_SERVICE_KEY` and `NEW_SUPABASE_SERVICE_KEY` in `.env` first. Auth users are not copied; students and teachers must re-register (or use Supabase Auth export in the dashboard).
 
 ### 3. Auth settings (recommended)
 
