@@ -11,7 +11,7 @@ const LMSFooter = () => {
           onClick={() => setShowAdminDialog(true)}
           className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
         >
-          EduLearn LMS © 2026
+          Bubusawin National High School (BNHS) © 2026
         </button>
       </footer>
       <AdminCodeDialog open={showAdminDialog} onOpenChange={setShowAdminDialog} />
