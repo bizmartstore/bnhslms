@@ -98,7 +98,6 @@ export type Database = {
           from_name: string | null
           full_content: string | null
           id: string
-          image_url: string | null
           is_active: boolean | null
           is_new: boolean | null
           preview_text: string | null
@@ -113,7 +112,6 @@ export type Database = {
           from_name?: string | null
           full_content?: string | null
           id?: string
-          image_url?: string | null
           is_active?: boolean | null
           is_new?: boolean | null
           preview_text?: string | null
@@ -128,7 +126,6 @@ export type Database = {
           from_name?: string | null
           full_content?: string | null
           id?: string
-          image_url?: string | null
           is_active?: boolean | null
           is_new?: boolean | null
           preview_text?: string | null
@@ -180,68 +177,6 @@ export type Database = {
           subtitle?: string | null
           title?: string
           updated_at?: string | null
-        }
-        Relationships: []
-      }
-      event_images: {
-        Row: {
-          created_at: string
-          event_id: string
-          id: string
-          image_data: string
-          sort_order: number
-        }
-        Insert: {
-          created_at?: string
-          event_id: string
-          id?: string
-          image_data: string
-          sort_order?: number
-        }
-        Update: {
-          created_at?: string
-          event_id?: string
-          id?: string
-          image_data?: string
-          sort_order?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "event_images_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      events: {
-        Row: {
-          content: string | null
-          created_at: string
-          id: string
-          is_active: boolean
-          sort_order: number
-          title: string
-          updated_at: string
-        }
-        Insert: {
-          content?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          sort_order?: number
-          title?: string
-          updated_at?: string
-        }
-        Update: {
-          content?: string | null
-          created_at?: string
-          id?: string
-          is_active?: boolean
-          sort_order?: number
-          title?: string
-          updated_at?: string
         }
         Relationships: []
       }
@@ -379,7 +314,6 @@ export type Database = {
         Row: {
           approval_status: Database["public"]["Enums"]["approval_status"]
           approved_by: string | null
-          avatar_data: string | null
           contact_number: string
           created_at: string
           email: string
@@ -397,7 +331,6 @@ export type Database = {
         Insert: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
           approved_by?: string | null
-          avatar_data?: string | null
           contact_number: string
           created_at?: string
           email: string
@@ -415,7 +348,6 @@ export type Database = {
         Update: {
           approval_status?: Database["public"]["Enums"]["approval_status"]
           approved_by?: string | null
-          avatar_data?: string | null
           contact_number?: string
           created_at?: string
           email?: string
@@ -708,74 +640,24 @@ export type Database = {
           content: string
           created_at: string
           id: string
-          recipient_id: string | null
-          reply_to_id: string | null
           section_id: string
-          sender_name: string | null
           user_id: string
         }
         Insert: {
           content: string
           created_at?: string
           id?: string
-          recipient_id?: string | null
-          reply_to_id?: string | null
           section_id: string
-          sender_name?: string | null
           user_id: string
         }
         Update: {
           content?: string
           created_at?: string
           id?: string
-          recipient_id?: string | null
-          reply_to_id?: string | null
           section_id?: string
-          sender_name?: string | null
           user_id?: string
         }
         Relationships: []
-      }
-      student_term_grades: {
-        Row: {
-          created_at: string
-          entered_by: string
-          final_average: number
-          id: string
-          section_subject_id: string
-          student_id: string
-          term: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          entered_by: string
-          final_average: number
-          id?: string
-          section_subject_id: string
-          student_id: string
-          term: number
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          entered_by?: string
-          final_average?: number
-          id?: string
-          section_subject_id?: string
-          student_id?: string
-          term?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "student_term_grades_section_subject_id_fkey"
-            columns: ["section_subject_id"]
-            isOneToOne: false
-            referencedRelation: "section_subjects"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       section_subjects: {
         Row: {
@@ -819,7 +701,6 @@ export type Database = {
       sections: {
         Row: {
           color: string | null
-          cover_image_data: string | null
           cover_image_url: string | null
           created_at: string
           description: string | null
@@ -833,7 +714,6 @@ export type Database = {
         }
         Insert: {
           color?: string | null
-          cover_image_data?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -847,7 +727,6 @@ export type Database = {
         }
         Update: {
           color?: string | null
-          cover_image_data?: string | null
           cover_image_url?: string | null
           created_at?: string
           description?: string | null
@@ -1039,24 +918,6 @@ export type Database = {
         Returns: Database["public"]["Enums"]["approval_status"]
       }
       grant_admin_role: { Args: { _user_id: string }; Returns: boolean }
-      admin_set_user_role: {
-        Args: { _target_user_id: string; _role: Database["public"]["Enums"]["app_role"]; _grant: boolean }
-        Returns: boolean
-      }
-      admin_delete_user: { Args: { _target_user_id: string }; Returns: boolean }
-      create_user_profile: {
-        Args: {
-          _first_name: string
-          _last_name: string
-          _contact_number: string
-          _user_type: Database["public"]["Enums"]["user_type"]
-          _school?: string | null
-          _grade_level?: string | null
-          _school_level?: Database["public"]["Enums"]["school_level"] | null
-          _subject_taught?: string | null
-        }
-        Returns: string
-      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1071,14 +932,6 @@ export type Database = {
       is_section_owner: {
         Args: { _section_id: string; _user_id: string }
         Returns: boolean
-      }
-      request_section_join: {
-        Args: { p_section_id: string; p_passcode: string }
-        Returns: undefined
-      }
-      set_section_join_passcode: {
-        Args: { p_section_id: string; p_passcode: string }
-        Returns: undefined
       }
       submit_quiz: { Args: { _answers: Json; _quiz_id: string }; Returns: Json }
     }
