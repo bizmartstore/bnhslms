@@ -129,10 +129,10 @@ const InstallPWA = () => {
       ? `Links opened in ${appLabel} can't install apps. Tap ⋯ (menu) → Open in Safari, then Share → Add to Home Screen.`
       : `Links opened in ${appLabel} can't install apps. Open this page in Chrome, then tap Install App.`
     : showAndroidMenuHint
-      ? "Tap ⋮ in Chrome → Install app (or Add to Home screen) to install iCAPI LMS."
+      ? "Tap ⋮ in Chrome → Install app (or Add to Home screen) to install BNHS LMS."
       : isIOS
         ? 'Tap Share, then "Add to Home Screen" to install the app on your phone.'
-        : "Add iCAPI LMS to your home screen for quick access like a native app.";
+        : "Add BNHS LMS to your home screen for quick access like a native app.";
 
   return (
     <div className="fixed bottom-4 left-4 right-4 z-[100] max-w-md mx-auto animate-fade-in">
@@ -140,11 +140,11 @@ const InstallPWA = () => {
         <div className="flex items-start gap-3">
           <img
             src="/icapi-logo.png"
-            alt="iCAPI LMS"
+            alt="BNHS LMS"
             className="h-10 w-10 object-contain shrink-0"
           />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-bold text-foreground">Install iCAPI LMS</p>
+            <p className="text-sm font-bold text-foreground">Install BNHS LMS</p>
             <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
             <div className="flex flex-wrap gap-2 mt-3">
               {needsExternalBrowser && !isIOS && (

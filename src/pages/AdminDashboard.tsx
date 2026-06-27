@@ -974,11 +974,11 @@ const EditDialog = ({ dialog, onClose, onSaved }: { dialog: { open: boolean; typ
       let error;
 
       if (isEdit && eventId) {
-        ({ error } = await supabase.from("events").update(eventData).eq("id", eventId));
+        ({ error } = await supabase.from("events").update(eventData as any).eq("id", eventId));
       } else {
         const { data: inserted, error: insertErr } = await supabase
           .from("events")
-          .insert(eventData)
+          .insert(eventData as any)
           .select("id")
           .single();
         error = insertErr;

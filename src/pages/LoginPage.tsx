@@ -89,10 +89,10 @@ const LoginPage = () => {
         <div className="text-center">
           <img
             src="/icapi-logo.png"
-            alt="iCAPI LMS"
+            alt="BNHS LMS"
             className="h-20 w-20 object-contain mx-auto mb-4"
           />
-          <h1 className="text-2xl font-bold text-foreground">Welcome to iCAPI LMS</h1>
+          <h1 className="text-2xl font-bold text-foreground">Welcome to BNHS LMS</h1>
           <p className="text-sm text-muted-foreground mt-1">Sign in to your account</p>
         </div>
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = "icapi-lms-v4";
+const CACHE_NAME = "bnhs-lms-v5";
 
 const PRECACHE = [
   "/",

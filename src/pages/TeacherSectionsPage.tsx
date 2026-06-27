@@ -16,6 +16,7 @@ import {
 import { toast } from "sonner";
 import LMSHeader from "@/components/lms/LMSHeader";
 import SectionCoverUploadField from "@/components/lms/SectionCoverUploadField";
+import ImageUploadField from "@/components/lms/ImageUploadField";
 import { getSectionCoverSrc } from "@/lib/section-image";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { isValidJoinPasscode, setSectionJoinPasscode } from "@/lib/section-passcode";

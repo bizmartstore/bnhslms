@@ -14,7 +14,7 @@ export type QuizCertificateData = {
 };
 
 export function formatControlNumber(attemptId: string) {
-  return `ICAPI-${attemptId.replace(/-/g, "").slice(0, 12).toUpperCase()}`;
+  return `BNHS-${attemptId.replace(/-/g, "").slice(0, 12).toUpperCase()}`;
 }
 
 async function renderCertificateImage(data: QuizCertificateData): Promise<string> {
@@ -45,7 +45,7 @@ async function renderCertificateImage(data: QuizCertificateData): Promise<string
   ctx.fillStyle = "#f5e6b8";
   ctx.font = "bold 28px Georgia, serif";
   ctx.textAlign = "center";
-  ctx.fillText("iCAPI LMS", canvas.width / 2, 120);
+  ctx.fillText("BNHS LMS", canvas.width / 2, 120);
 
   ctx.fillStyle = "#ffffff";
   ctx.font = "bold 52px Georgia, serif";
@@ -97,7 +97,7 @@ export async function downloadQuizCertificate(data: QuizCertificateData) {
   const dataUrl = await renderCertificateImage(data);
   const control = formatControlNumber(data.attemptId);
   const link = document.createElement("a");
-  link.download = `iCAPI-certificate-${control}.png`;
+  link.download = `BNHS-certificate-${control}.png`;
   link.href = dataUrl;
   link.click();
 }

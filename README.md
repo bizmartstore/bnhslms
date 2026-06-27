@@ -1,4 +1,4 @@
-# iCAPI LMS
+# BNHS LMS
 
 ## Supabase setup (project `mvxyqbjwnpwcovkarwqa`)
 

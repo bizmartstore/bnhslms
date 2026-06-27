@@ -1,7 +1,7 @@
 {
-  "name": "iCAPI LMS",
-  "short_name": "iCAPI",
-  "description": "iCAPI LMS is an all-in-one learning management system designed to empower students and educators.",
+  "name": "BNHS LMS",
+  "short_name": "BNHS",
+  "description": "BNHS LMS is an all-in-one learning management system designed to empower students and educators.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
