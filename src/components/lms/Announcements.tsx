@@ -18,6 +18,7 @@ type Announcement = {
   created_at: string | null;
   scope?: string | null;
   section_id?: string | null;
+  is_active?: boolean | null;
 };
 
 const Announcements = () => {
