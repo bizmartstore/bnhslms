@@ -62,6 +62,28 @@ const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading, profile, roles } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (profile && profile.approval_status !== "approved") return <Navigate to="/login" replace />;
+  if (!roles.includes("admin")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center bg-card rounded-2xl p-8 card-shadow max-w-md">
+          <h2 className="text-lg font-bold text-foreground mb-2">Admin only</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            This page is restricted to administrators. Sign in with the bootstrap admin account
+            (the one configured during setup) to access the Admin Dashboard.
+          </p>
+          <Navigate to="/login" replace />
+        </div>
+      </div>
+    );
+  }
+  return <>{children}</>;
+};
+
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading, profile } = useAuth();
   if (loading) return <LoadingScreen />;
