@@ -130,7 +130,7 @@ const Index = () => {
           ) : (
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-bold text-foreground">Welcome to EduLearn 🎓</p>
+                <p className="text-sm font-bold text-foreground">Welcome to BNHS LMS 🎓</p>
                 <p className="text-[11px] text-muted-foreground">Sign in to start learning</p>
               </div>
               <div className="flex gap-1.5">
