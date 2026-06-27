@@ -7,6 +7,7 @@ import UpcomingTasks from "@/components/lms/UpcomingTasks";
 import Announcements from "@/components/lms/Announcements";
 import ModulesShowcase from "@/components/lms/ModulesShowcase";
 import LMSFooter from "@/components/lms/LMSFooter";
+import AdminVerifiedBanner from "@/components/lms/AdminVerifiedBanner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
@@ -68,6 +69,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <LMSHeader />
+      <AdminVerifiedBanner />
 
       <div className="max-w-3xl mx-auto">
         {/* Hero Banner */}

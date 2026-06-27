@@ -17,6 +17,7 @@ import {
   Upload, Loader2, Copy, PartyPopper,
 } from "lucide-react";
 import ImageUploadField from "@/components/lms/ImageUploadField";
+import BannerLivePreview from "@/components/lms/BannerLivePreview";
 import { uploadBannerImage } from "@/lib/image-upload";
 import { compressToEventDataUrl } from "@/lib/event-image";
 import { isBootstrapAdmin, BOOTSTRAP_ADMIN_EMAIL } from "@/lib/auth-config";
@@ -386,6 +387,7 @@ const AdminDashboard = () => {
             {/* BANNERS TAB */}
             {tab === "banners" && (
               <div className="space-y-3">
+                <BannerLivePreview banners={banners as any} events={events as any} />
                 <div className="flex justify-between items-center">
                   <h3 className="text-sm font-bold text-foreground">Banners ({banners.length})</h3>
                   <Button size="sm" className="rounded-xl text-xs" onClick={() => openCreate("banners")}>
