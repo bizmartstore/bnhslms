@@ -24,6 +24,7 @@ import TeachSubjectDashboard from "./pages/TeachSubjectDashboard.tsx";
 import StudentSubjectView from "./pages/StudentSubjectView.tsx";
 import CompleteProfilePage from "./pages/CompleteProfilePage.tsx";
 import EventsPage from "./pages/EventsPage.tsx";
+import AdminDiagnosticsPage from "./pages/AdminDiagnosticsPage.tsx";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +59,28 @@ const TeacherRoute = ({ children }: { children: React.ReactNode }) => {
   if (!user) return <Navigate to="/login" replace />;
   if (profile && profile.approval_status !== "approved") return <Navigate to="/login" replace />;
   if (!roles.includes("teacher") && !roles.includes("admin")) return <Navigate to="/" replace />;
+  return <>{children}</>;
+};
+
+const AdminRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading, profile, roles } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/login" replace />;
+  if (profile && profile.approval_status !== "approved") return <Navigate to="/login" replace />;
+  if (!roles.includes("admin")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center bg-card rounded-2xl p-8 card-shadow max-w-md">
+          <h2 className="text-lg font-bold text-foreground mb-2">Admin only</h2>
+          <p className="text-sm text-muted-foreground mb-4">
+            This page is restricted to administrators. Sign in with the bootstrap admin account
+            (the one configured during setup) to access the Admin Dashboard.
+          </p>
+          <Navigate to="/login" replace />
+        </div>
+      </div>
+    );
+  }
   return <>{children}</>;
 };
 
@@ -116,7 +139,8 @@ const App = () => (
             <Route path="/messages" element={<ProtectedRoute><MessagesPage /></ProtectedRoute>} />
             <Route path="/grades" element={<ProtectedRoute><GradesPage /></ProtectedRoute>} />
             <Route path="/notifications" element={<ProtectedRoute><NotificationsRedirect /></ProtectedRoute>} />
-            <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>} />
+            <Route path="/admin/diagnostics" element={<AdminRoute><AdminDiagnosticsPage /></AdminRoute>} />
             <Route path="/approvals" element={<ProtectedRoute><TeacherRoute><TeacherApprovalPage /></TeacherRoute></ProtectedRoute>} />
             <Route path="/sections" element={<ProtectedRoute><TeacherRoute><TeacherSectionsPage /></TeacherRoute></ProtectedRoute>} />
             <Route path="/section/:id" element={<SectionDetail />} />

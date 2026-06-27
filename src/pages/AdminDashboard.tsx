@@ -311,6 +311,12 @@ const AdminDashboard = () => {
               )}
             </button>
           ))}
+          <button
+            onClick={() => navigate("/admin/diagnostics")}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap bg-accent/20 text-accent-foreground border border-accent/40"
+          >
+            <Shield className="h-3.5 w-3.5" /> Diagnostics
+          </button>
         </div>
 
         {loading ? (
