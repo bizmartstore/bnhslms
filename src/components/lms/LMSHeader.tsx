@@ -27,8 +27,8 @@ const LMSHeader = () => {
             className="h-8 w-8 object-contain shrink-0 pointer-events-none"
           />
           <div className="leading-none text-left">
-            <span className="block font-serif-display text-[17px] font-bold text-primary-foreground tracking-tight">iCAPI</span>
-            <span className="block text-[8px] font-bold uppercase tracking-[0.2em] text-accent">LMS</span>
+            <span className="block font-serif-display text-[17px] font-bold text-primary-foreground tracking-tight">BNHS</span>
+            <span className="block text-[8px] font-bold uppercase tracking-[0.2em] text-accent">Bubusawin National High School</span>
           </div>
         </button>
         <div className="flex-1" />
