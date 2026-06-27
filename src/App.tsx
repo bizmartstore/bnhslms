@@ -7,6 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { UnreadMessagesProvider } from "@/contexts/UnreadMessagesContext";
 import { NotificationFeedProvider } from "@/contexts/NotificationFeedContext";
+import { PendingBadgesProvider } from "@/contexts/PendingBadgesContext";
 import InstallPWA from "@/components/lms/InstallPWA";
 import AppBadgeSync from "@/components/lms/AppBadgeSync";
 import DisableTextCopy from "@/components/lms/DisableTextCopy";
@@ -123,6 +124,7 @@ const App = () => (
         <AuthProvider>
           <UnreadMessagesProvider>
           <NotificationFeedProvider>
+          <PendingBadgesProvider>
           <AppBadgeSync />
           <ProfileGate>
           <InstallPWA />
@@ -153,6 +155,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           </ProfileGate>
+          </PendingBadgesProvider>
           </NotificationFeedProvider>
           </UnreadMessagesProvider>
         </AuthProvider>
