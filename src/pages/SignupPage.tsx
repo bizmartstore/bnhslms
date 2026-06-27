@@ -8,8 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { UserPlus, ArrowLeft, GraduationCap, BookOpen } from "lucide-react";
-import { signUpWithProfile } from "@/lib/signup-profile";
-import { isBootstrapAdmin } from "@/lib/auth-config";
+import { signUpWithProfile, getSignupSuccessMessage } from "@/lib/signup-profile";
 import { formatSignupError, validateSignupPassword } from "@/lib/password-validation";
 
 type SignupTab = "student" | "teacher";
@@ -82,7 +81,7 @@ const SignupPage = () => {
 
     setLoading(true);
     try {
-      await signUpWithProfile(email, password, {
+      const result = await signUpWithProfile(email, password, {
         first_name: firstName,
         last_name: lastName,
         contact_number: contactNumber,
@@ -93,11 +92,7 @@ const SignupPage = () => {
       });
 
       await supabase.auth.signOut();
-      toast.success(
-        isBootstrapAdmin(email)
-          ? "Admin account created! You can log in now."
-          : "Account created! Please wait for teacher approval before logging in."
-      );
+      toast.success(getSignupSuccessMessage(email, !!result.session, "student"));
       navigate("/login");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Signup failed";
@@ -119,7 +114,7 @@ const SignupPage = () => {
 
     setLoading(true);
     try {
-      await signUpWithProfile(email, password, {
+      const result = await signUpWithProfile(email, password, {
         first_name: firstName,
         last_name: lastName,
         contact_number: contactNumber,
@@ -128,11 +123,7 @@ const SignupPage = () => {
       });
 
       await supabase.auth.signOut();
-      toast.success(
-        isBootstrapAdmin(email)
-          ? "Admin account created! You can log in now."
-          : "Account created! Please wait for admin approval before logging in."
-      );
+      toast.success(getSignupSuccessMessage(email, !!result.session, "teacher"));
       navigate("/login");
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Signup failed";

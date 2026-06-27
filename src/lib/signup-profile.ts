@@ -54,6 +54,18 @@ export async function signUpWithProfile(email: string, password: string, profile
   return data;
 }
 
+export function getSignupSuccessMessage(email: string, hasSession: boolean, userType: "student" | "teacher"): string {
+  if (!hasSession) {
+    return "Account created! Check your email to confirm your address, then log in.";
+  }
+  if (isBootstrapAdmin(email)) {
+    return "Admin account created! You can log in now.";
+  }
+  return userType === "teacher"
+    ? "Account created! Please wait for admin approval before logging in."
+    : "Account created! Please wait for teacher approval before logging in.";
+}
+
 export async function ensureBootstrapAdmin(userId: string, email: string | undefined | null) {
   if (!isBootstrapAdmin(email)) return;
 

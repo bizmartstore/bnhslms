@@ -32,5 +32,19 @@ export function formatSignupError(message: string): string {
   if (lower.includes("email") && lower.includes("invalid")) {
     return "Enter a valid email address (e.g. yourname@gmail.com).";
   }
+  if (lower.includes("already registered") || lower.includes("already exists")) {
+    return "This email is already registered. Try logging in instead.";
+  }
+  return message;
+}
+
+export function formatLoginError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials") || lower.includes("invalid_credentials")) {
+    return "Incorrect email or password. Check your password and try again.";
+  }
+  if (lower.includes("email not confirmed")) {
+    return "Please confirm your email first — check your inbox for the verification link.";
+  }
   return message;
 }

@@ -19,7 +19,7 @@
     "db:migrate-data": "node --env-file=.env scripts/migrate-supabase-data.mjs",
     "supabase:push": "supabase db push",
     "db:push:sql": "node --env-file=.env scripts/push-all-migrations.mjs",
-    "process:logo": "node scripts/process-logo.mjs"
+    "fix:admin": "node --env-file=.env scripts/fix-bootstrap-admin.mjs",
   },
   "dependencies": {
     "@fontsource/dm-serif-display": "^5.2.8",

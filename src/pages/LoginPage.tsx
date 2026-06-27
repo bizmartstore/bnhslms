@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { LogIn } from "lucide-react";
 import { ensureBootstrapAdmin } from "@/lib/signup-profile";
 import { isBootstrapAdmin } from "@/lib/auth-config";
+import { formatLoginError } from "@/lib/password-validation";
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ const LoginPage = () => {
       toast.success("Login successful!");
       navigate("/");
     } catch (error: any) {
-      toast.error(error.message || "Login failed");
+      toast.error(formatLoginError(error.message || "Login failed"));
     } finally {
       setLoading(false);
     }
