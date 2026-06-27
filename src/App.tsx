@@ -6,7 +6,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { UnreadMessagesProvider } from "@/contexts/UnreadMessagesContext";
+import { NotificationFeedProvider } from "@/contexts/NotificationFeedContext";
 import InstallPWA from "@/components/lms/InstallPWA";
+import AppBadgeSync from "@/components/lms/AppBadgeSync";
 import DisableTextCopy from "@/components/lms/DisableTextCopy";
 import Index from "./pages/Index.tsx";
 import SubjectDetail from "./pages/SubjectDetail.tsx";
@@ -120,6 +122,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <UnreadMessagesProvider>
+          <NotificationFeedProvider>
+          <AppBadgeSync />
           <ProfileGate>
           <InstallPWA />
           <DisableTextCopy />
@@ -149,6 +153,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
           </ProfileGate>
+          </NotificationFeedProvider>
           </UnreadMessagesProvider>
         </AuthProvider>
       </BrowserRouter>

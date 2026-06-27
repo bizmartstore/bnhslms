@@ -1,4 +1,4 @@
-const CACHE_NAME = "bnhs-lms-v6";
+const CACHE_NAME = "bnhs-lms-v7";
 const CACHE_PREFIX = "bnhs-lms-";
 
 const PRECACHE = [
@@ -28,6 +28,18 @@ self.addEventListener("activate", (event) => {
       .then((keys) => Promise.all(keys.filter((k) => k.startsWith(CACHE_PREFIX) && k !== CACHE_NAME).map((k) => caches.delete(k))))
       .then(() => self.clients.claim())
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type !== "SET_APP_BADGE") return;
+  const count = Math.max(0, Math.floor(Number(event.data.count) || 0));
+  const reg = self.registration;
+  if (!reg) return;
+  if (count > 0 && reg.setAppBadge) {
+    event.waitUntil(reg.setAppBadge(count));
+  } else if (count === 0 && reg.clearAppBadge) {
+    event.waitUntil(reg.clearAppBadge());
+  }
 });
 
 function isNavigationRequest(request) {
