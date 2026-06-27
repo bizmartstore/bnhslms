@@ -1,5 +1,3 @@
-import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
 import "@fontsource/dm-serif-display/400.css";
 import "@fontsource/fira-sans/300.css";
 import "@fontsource/fira-sans/400.css";
@@ -9,9 +7,23 @@ import "@fontsource/fira-sans/700.css";
 import "./index.css";
 import { initPwaInstallPromptCapture } from "@/lib/pwa-install";
 
-initPwaInstallPromptCapture();
+const PWA_CACHE_PREFIX = "bnhs-lms-";
 
-if ("serviceWorker" in navigator) {
+const clearPreviewPwaState = async () => {
+  if (!("serviceWorker" in navigator)) return;
+
+  if (import.meta.env.DEV) {
+    await Promise.allSettled([
+      navigator.serviceWorker
+        .getRegistrations()
+        .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister()))),
+      "caches" in window
+        ? caches.keys().then((keys) => Promise.all(keys.filter((key) => key.startsWith(PWA_CACHE_PREFIX)).map((key) => caches.delete(key))))
+        : Promise.resolve(),
+    ]);
+    return;
+  }
+
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/sw.js")
@@ -20,7 +32,7 @@ if ("serviceWorker" in navigator) {
       })
       .catch(() => {});
   });
-}
+};
 
 let lastTouchEnd = 0;
 document.addEventListener("touchend", (e) => {
@@ -37,4 +49,18 @@ document.addEventListener("wheel", (e) => {
   if (e.ctrlKey) e.preventDefault();
 }, { passive: false });
 
-createRoot(document.getElementById("root")!).render(<App />);
+const bootstrap = async () => {
+  initPwaInstallPromptCapture();
+  await clearPreviewPwaState();
+
+  const [{ createRoot }, { default: App }] = await Promise.all([
+    import("react-dom/client"),
+    import("./App.tsx"),
+  ]);
+
+  createRoot(document.getElementById("root")!).render(<App />);
+};
+
+bootstrap().catch((error) => {
+  console.error("Failed to start BNHS LMS", error);
+});
