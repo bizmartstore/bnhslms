@@ -6,9 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { LogIn } from "lucide-react";
-import { ensureBootstrapAdmin } from "@/lib/signup-profile";
-import { isBootstrapAdmin } from "@/lib/auth-config";
 import { formatLoginError } from "@/lib/password-validation";
+import { isBootstrapAdmin } from "@/lib/auth-config";
 import { useAuth } from "@/contexts/AuthContext";
 
 const LoginPage = () => {
@@ -29,13 +28,17 @@ const LoginPage = () => {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
-      await ensureBootstrapAdmin(data.user.id, data.user.email);
-
-      // Refresh through the auth client (not the stale `user` context value),
-      // so a profile created just now is visible before we route.
+      // Refresh through the auth client (not the stale `user` context value).
+      // The auth context also provisions the default admin profile if needed.
       const profile = await refreshProfile();
 
       if (!profile) {
+        // The default admin should always reach the app, never the profile form.
+        if (isBootstrapAdmin(data.user.email)) {
+          toast.success("Welcome back, admin!");
+          navigate("/");
+          return;
+        }
         toast.info("Please complete your profile to continue.");
         navigate("/complete-profile");
         return;
@@ -71,7 +74,7 @@ const LoginPage = () => {
 
       if (isBootstrapAdmin(data.user.email)) {
         toast.success("Welcome back, admin!");
-        navigate("/admin");
+        navigate("/");
         return;
       }
 

@@ -28,6 +28,7 @@ import StudentSubjectView from "./pages/StudentSubjectView.tsx";
 import CompleteProfilePage from "./pages/CompleteProfilePage.tsx";
 import EventsPage from "./pages/EventsPage.tsx";
 import AdminDiagnosticsPage from "./pages/AdminDiagnosticsPage.tsx";
+import { isBootstrapAdmin } from "@/lib/auth-config";
 
 const queryClient = new QueryClient();
 
@@ -88,9 +89,11 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading, profile } = useAuth();
-  if (loading) return <LoadingScreen />;
-  if (user && !profile) return <Navigate to="/complete-profile" replace />;
+  const { user, loading, profile, profileLoading } = useAuth();
+  if (loading || profileLoading) return <LoadingScreen />;
+  // Never send the default admin to "Complete your profile" while their
+  // profile is still being provisioned or failed to load.
+  if (user && !profile && !isBootstrapAdmin(user.email)) return <Navigate to="/complete-profile" replace />;
   if (user && profile?.approval_status === "approved") return <Navigate to="/" replace />;
   return <>{children}</>;
 };
@@ -106,10 +109,15 @@ const NotificationsRedirect = () => {
 };
 
 const ProfileGate = ({ children }: { children: React.ReactNode }) => {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, profileLoading } = useAuth();
   const location = useLocation();
-  if (loading) return <LoadingScreen />;
-  if (user && !profile && location.pathname !== "/complete-profile") {
+  if (loading || profileLoading) return <LoadingScreen />;
+  if (
+    user &&
+    !profile &&
+    !isBootstrapAdmin(user.email) &&
+    location.pathname !== "/complete-profile"
+  ) {
     return <Navigate to="/complete-profile" replace />;
   }
   return <>{children}</>;

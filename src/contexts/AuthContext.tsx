@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { isBootstrapAdmin } from "@/lib/auth-config";
+import { ensureBootstrapAdmin } from "@/lib/signup-profile";
 
 type Profile = {
   id: string;
@@ -26,6 +28,8 @@ type AuthContextType = {
   profile: Profile | null;
   roles: UserRole[];
   loading: boolean;
+  /** True while the profile for the current signed-in user is still being loaded. */
+  profileLoading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<Profile | null>;
 };
@@ -36,6 +40,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   roles: [],
   loading: true,
+  profileLoading: false,
   signOut: async () => {},
   refreshProfile: async () => null,
 });
@@ -48,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
+  const [profileForUserId, setProfileForUserId] = useState<string | null>(null);
 
   const fetchProfile = async (userId: string): Promise<Profile | null> => {
     const { data, error } = await supabase
@@ -74,14 +80,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRoles((data || []).map((r) => r.role as UserRole));
   };
 
+  const loadProfileForUser = async (authUser: User): Promise<Profile | null> => {
+    let nextProfile: Profile | null = null;
+    try {
+      nextProfile = await fetchProfile(authUser.id);
+      // The default admin must never be stranded on "Complete your profile".
+      // If the row is missing (e.g. account created before the auth trigger),
+      // provision it once and load it again.
+      if (!nextProfile && isBootstrapAdmin(authUser.email)) {
+        await ensureBootstrapAdmin(authUser.id, authUser.email);
+        nextProfile = await fetchProfile(authUser.id);
+      }
+      await fetchRoles(authUser.id);
+    } finally {
+      // Marks the profile as resolved for this user, even when it is null, so
+      // route guards do not redirect while the request is still in flight.
+      setProfileForUserId(authUser.id);
+    }
+    return nextProfile;
+  };
+
   const refreshProfile = async (): Promise<Profile | null> => {
     // Read the user from the auth client: callers such as the login handler may
     // hold a stale `user` value from before the sign-in event was processed.
     const { data } = await supabase.auth.getUser();
-    const userId = data.user?.id;
-    if (!userId) return null;
-    const [nextProfile] = await Promise.all([fetchProfile(userId), fetchRoles(userId)]);
-    return nextProfile;
+    const authUser = data.user;
+    if (!authUser) return null;
+    return loadProfileForUser(authUser);
   };
 
   const signOut = async () => {
@@ -90,6 +115,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setProfile(null);
     setRoles([]);
+    setProfileForUserId(null);
   };
 
   useEffect(() => {
@@ -117,16 +143,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
+          const authUser = session.user;
           setTimeout(async () => {
-            await Promise.all([
-              fetchProfile(session.user.id),
-              fetchRoles(session.user.id),
-            ]);
+            await loadProfileForUser(authUser);
             setLoading(false);
           }, 0);
         } else {
           setProfile(null);
           setRoles([]);
+          setProfileForUserId(null);
           setLoading(false);
         }
       }
@@ -136,11 +161,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        Promise.all([
-          fetchProfile(session.user.id),
-          fetchRoles(session.user.id),
-        ]).then(() => setLoading(false));
+        loadProfileForUser(session.user).then(() => setLoading(false));
       } else {
+        setProfileForUserId(null);
         setLoading(false);
       }
     });
@@ -151,14 +174,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const refreshOnVisible = () => {
       if (document.visibilityState !== "visible" || !user) return;
-      void Promise.all([fetchProfile(user.id), fetchRoles(user.id)]);
+      void loadProfileForUser(user);
     };
     document.addEventListener("visibilitychange", refreshOnVisible);
     return () => document.removeEventListener("visibilitychange", refreshOnVisible);
   }, [user?.id]);
 
+  const profileLoading = !!user && profileForUserId !== user.id;
+
   return (
-    <AuthContext.Provider value={{ user, session, profile, roles, loading, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, session, profile, roles, loading, profileLoading, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );
