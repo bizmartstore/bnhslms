@@ -10,8 +10,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { UserPlus, GraduationCap, BookOpen } from "lucide-react";
 import { isBootstrapAdmin } from "@/lib/auth-config";
+import { withTimeout } from "@/lib/with-timeout";
 
 type ProfileTab = "student" | "teacher";
+
+const SAVE_TIMEOUT_MS = 30_000;
+
+function errorMessage(error: unknown, fallback: string): string {
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message) return message;
+  }
+  return fallback;
+}
 
 const CompleteProfilePage = () => {
   const navigate = useNavigate();
@@ -65,18 +77,29 @@ const CompleteProfilePage = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.rpc("create_user_profile", {
-        _first_name: firstName,
-        _last_name: lastName,
-        _contact_number: contactNumber,
-        _user_type: "student",
-        _school: school,
-        _grade_level: gradeLevel,
-        _school_level: schoolLevel,
-      });
+      const { error } = await withTimeout(
+        supabase.rpc("create_user_profile", {
+          _first_name: firstName,
+          _last_name: lastName,
+          _contact_number: contactNumber,
+          _user_type: "student",
+          _school: school,
+          _grade_level: gradeLevel,
+          _school_level: schoolLevel,
+        }),
+        SAVE_TIMEOUT_MS,
+        "Saving your profile timed out. Please check your connection and try again.",
+      );
       if (error) throw error;
 
-      await refreshProfile();
+      const saved = await withTimeout(
+        refreshProfile(),
+        SAVE_TIMEOUT_MS,
+        "Your profile was saved, but loading it timed out. Please refresh the page.",
+      );
+      if (!saved) {
+        throw new Error("Your profile was saved, but it could not be loaded. Please refresh the page.");
+      }
       if (isBootstrapAdmin(email)) {
         toast.success("Admin profile saved! You can log in now.");
         navigate("/");
@@ -86,8 +109,7 @@ const CompleteProfilePage = () => {
       navigate("/login");
       await signOut();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Failed to save profile";
-      toast.error(message);
+      toast.error(errorMessage(error, "Failed to save profile"));
     } finally {
       setLoading(false);
     }
@@ -104,16 +126,27 @@ const CompleteProfilePage = () => {
 
     setLoading(true);
     try {
-      const { error } = await supabase.rpc("create_user_profile", {
-        _first_name: firstName,
-        _last_name: lastName,
-        _contact_number: contactNumber,
-        _user_type: "teacher",
-        _subject_taught: subjectTaught,
-      });
+      const { error } = await withTimeout(
+        supabase.rpc("create_user_profile", {
+          _first_name: firstName,
+          _last_name: lastName,
+          _contact_number: contactNumber,
+          _user_type: "teacher",
+          _subject_taught: subjectTaught,
+        }),
+        SAVE_TIMEOUT_MS,
+        "Saving your profile timed out. Please check your connection and try again.",
+      );
       if (error) throw error;
 
-      await refreshProfile();
+      const saved = await withTimeout(
+        refreshProfile(),
+        SAVE_TIMEOUT_MS,
+        "Your profile was saved, but loading it timed out. Please refresh the page.",
+      );
+      if (!saved) {
+        throw new Error("Your profile was saved, but it could not be loaded. Please refresh the page.");
+      }
       if (isBootstrapAdmin(email)) {
         toast.success("Admin profile saved! You can log in now.");
         navigate("/");
@@ -123,8 +156,7 @@ const CompleteProfilePage = () => {
       navigate("/login");
       await signOut();
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "Failed to save profile";
-      toast.error(message);
+      toast.error(errorMessage(error, "Failed to save profile"));
     } finally {
       setLoading(false);
     }

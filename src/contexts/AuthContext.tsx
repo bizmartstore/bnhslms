@@ -27,7 +27,7 @@ type AuthContextType = {
   roles: UserRole[];
   loading: boolean;
   signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  refreshProfile: () => Promise<Profile | null>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -37,7 +37,7 @@ const AuthContext = createContext<AuthContextType>({
   roles: [],
   loading: true,
   signOut: async () => {},
-  refreshProfile: async () => {},
+  refreshProfile: async () => null,
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -49,16 +49,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string): Promise<Profile | null> => {
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
       .eq("user_id", userId)
       .maybeSingle();
     if (error) {
+      // Keep the previously loaded profile instead of bouncing the user back to
+      // "Complete your profile" on a transient network/RLS error.
       console.error("[auth] Failed to load profile:", error.message);
+      return null;
     }
-    setProfile(data as Profile | null);
+    const nextProfile = data as Profile | null;
+    setProfile(nextProfile);
+    return nextProfile;
   };
 
   const fetchRoles = async (userId: string) => {
@@ -69,10 +74,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setRoles((data || []).map((r) => r.role as UserRole));
   };
 
-  const refreshProfile = async () => {
-    if (user) {
-      await Promise.all([fetchProfile(user.id), fetchRoles(user.id)]);
-    }
+  const refreshProfile = async (): Promise<Profile | null> => {
+    // Read the user from the auth client: callers such as the login handler may
+    // hold a stale `user` value from before the sign-in event was processed.
+    const { data } = await supabase.auth.getUser();
+    const userId = data.user?.id;
+    if (!userId) return null;
+    const [nextProfile] = await Promise.all([fetchProfile(userId), fetchRoles(userId)]);
+    return nextProfile;
   };
 
   const signOut = async () => {

@@ -69,6 +69,36 @@ export function getSignupSuccessMessage(email: string, hasSession: boolean, user
 export async function ensureBootstrapAdmin(userId: string, email: string | undefined | null) {
   if (!isBootstrapAdmin(email)) return;
 
+  // The bootstrap account is special-cased for approval/roles, but that only
+  // works if a profiles row exists. Accounts created before the auth trigger
+  // (or re-created/migrated outside signup) have none, which strands the admin
+  // on the "Complete your profile" screen. Create a default profile once.
+  const { data: existing, error: profileError } = await supabase
+    .from("profiles")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (profileError) {
+    console.warn("[auth] Failed to check bootstrap admin profile:", profileError.message);
+  }
+
+  if (!existing) {
+    const { data: authData } = await supabase.auth.getUser();
+    const meta = (authData.user?.user_metadata ?? {}) as Record<string, string | null | undefined>;
+
+    const { error: createError } = await supabase.rpc("create_user_profile", {
+      _first_name: meta.first_name || "BNHS",
+      _last_name: meta.last_name || "Admin",
+      _contact_number: meta.contact_number || "",
+      _user_type: "teacher",
+      _subject_taught: meta.subject_taught || "Administration",
+    });
+    if (createError) {
+      console.warn("[auth] Failed to create bootstrap admin profile:", createError.message);
+    }
+  }
+
   await supabase.rpc("grant_admin_role", { _user_id: userId });
   await supabase
     .from("profiles")

@@ -1,4 +1,4 @@
-const CACHE_NAME = "bnhs-lms-v7";
+const CACHE_NAME = "bnhs-lms-v8";
 const CACHE_PREFIX = "bnhs-lms-";
 
 const PRECACHE = [

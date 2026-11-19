@@ -9,9 +9,11 @@ import { LogIn } from "lucide-react";
 import { ensureBootstrapAdmin } from "@/lib/signup-profile";
 import { isBootstrapAdmin } from "@/lib/auth-config";
 import { formatLoginError } from "@/lib/password-validation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const LoginPage = () => {
   const navigate = useNavigate();
+  const { refreshProfile } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,11 +31,9 @@ const LoginPage = () => {
 
       await ensureBootstrapAdmin(data.user.id, data.user.email);
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("approval_status, user_type")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      // Refresh through the auth client (not the stale `user` context value),
+      // so a profile created just now is visible before we route.
+      const profile = await refreshProfile();
 
       if (!profile) {
         toast.info("Please complete your profile to continue.");
